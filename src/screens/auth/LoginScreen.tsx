@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../navigation/types';
 import { LoginForm } from '../../components/forms/LoginForm';
 import { useTheme } from '../../hooks/useTheme';
+import { useSesion } from '../../context/SesionContext';
 import { Badge } from '../../components/ui/Badge';
 import { Card } from '../../components/ui/Card';
 
@@ -22,10 +23,11 @@ type LoginNavProp = NativeStackNavigationProp<RootStackParamList, 'Auth'>;
 export const LoginScreen: React.FC = () => {
   const navigation = useNavigation<LoginNavProp>();
   const theme = useTheme();
+  const { iniciarSesion } = useSesion();
 
   const handleLogin = (credentials: { email: string; password: string }) => {
     console.log('[LoginScreen] login exitoso:', credentials.email);
-    navigation.replace('MainTabs', undefined);
+    iniciarSesion(credentials.email);
   };
 
   return (

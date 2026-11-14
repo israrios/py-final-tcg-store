@@ -10,6 +10,7 @@ export type AuthStackParamList = {
 export type HomeStackParamList = {
   Home: undefined;
   CardDetail: { cardId: string };
+  CrearCarta: undefined;
 };
 
 // Search Stack
@@ -29,6 +30,7 @@ export type ProfileStackParamList = {
   Profile: undefined;
   Settings: undefined;
   ComponentCatalog: undefined;
+  Contacto: undefined;
 };
 
 // Main Tabs

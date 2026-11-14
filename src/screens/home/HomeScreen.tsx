@@ -10,8 +10,9 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSelector } from 'react-redux';
 import { HomeStackParamList } from '../../navigation/types';
-import { dummyCards } from '../../constants/dummyData';
+import { selectAllCards } from '../../store/cardsSlice';
 import { useTheme } from '../../hooks/useTheme';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -23,16 +24,23 @@ type HomeNavProp = NativeStackNavigationProp<HomeStackParamList, 'Home'>;
 export const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeNavProp>();
   const theme = useTheme();
+  const cards = useSelector(selectAllCards);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todas');
 
   const categories = ['Todas', 'Pokémon', 'Yu-Gi-Oh!', 'Magic'];
 
-  const filteredCards = dummyCards.filter((c) => {
+  const filteredCards = cards.filter((c) => {
     const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase());
     const matchCat =
       selectedCategory === 'Todas' ||
-      c.game.toLowerCase().includes(selectedCategory.toLowerCase());
+      c.game.toLowerCase().includes(
+        selectedCategory === 'Pokémon'
+          ? 'pokemon'
+          : selectedCategory === 'Yu-Gi-Oh!'
+          ? 'yugioh'
+          : 'magic'
+      );
     return matchSearch && matchCat;
   });
 
@@ -54,9 +62,13 @@ export const HomeScreen: React.FC = () => {
               <Text style={[styles.title, { color: theme.colors.neutral[900] }]}>
                 Cartas Disponibles
               </Text>
-              <Badge variant="default" size="sm">
-                Prototipo v0.1
-              </Badge>
+              <Button
+                size="sm"
+                onPress={() => navigation.push('CrearCarta')}
+                leftIcon={<Ionicons name="add" size={16} color={theme.colors.neutral[0]} />}
+              >
+                Publicar
+              </Button>
             </View>
 
             {/* Buscador */}

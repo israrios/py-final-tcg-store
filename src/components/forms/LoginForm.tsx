@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useTheme } from '../../hooks/useTheme';
 import { Button } from '../ui/Button/Button';
-import { Input } from '../ui/Input/Input';
+import { InputRef } from '../ui/Input/Input';
+import { FormField } from '../FormField';
+import { loginSchema, loginVacio, LoginFormValues } from '../../schemas/loginSchema';
 
 interface LoginFormProps {
   onLogin?: (credentials: { email: string; password: string }) => void;
@@ -15,21 +19,26 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({
   onLogin,
   onForgotPassword,
-  onRegister,
   loading = false,
   errorMessage,
 }) => {
   const theme = useTheme();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const passwordRef = useRef<InputRef>(null);
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Por favor completa todos los campos');
-      return;
-    }
-    console.log('[LoginForm] onLogin', { email, password });
-    onLogin?.({ email, password });
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: loginVacio,
+    mode: 'onBlur',
+    reValidateMode: 'onChange',
+  });
+
+  const onSubmit = (datos: LoginFormValues) => {
+    console.log('[LoginForm] onLogin', { email: datos.email });
+    onLogin?.(datos);
   };
 
   return (
@@ -52,35 +61,55 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </View>
       ) : null}
 
-      <Input
+      <FormField
+        control={control}
+        name="email"
         label="Correo electrónico"
         placeholder="tu@correo.com"
-        value={email}
-        onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
+        autoCorrect={false}
         autoComplete="email"
+        returnKeyType="next"
+        onSubmitEditing={() => passwordRef.current?.focus()}
       />
 
       <View style={{ height: theme.spacing[4] }} />
 
-      <Input
+      <FormField
+        ref={passwordRef}
+        control={control}
+        name="password"
         label="Contraseña"
         placeholder="••••••••"
-        value={password}
-        onChangeText={setPassword}
         variant="password"
+        autoCapitalize="none"
+        autoCorrect={false}
+        returnKeyType="send"
+        onSubmitEditing={() => handleSubmit(onSubmit)()}
       />
 
       <View style={{ height: theme.spacing[6] }} />
 
-      <Button onPress={handleLogin} fullWidth loading={loading}>
+      <Button
+        onPress={() => handleSubmit(onSubmit)()}
+        fullWidth
+        loading={loading || isSubmitting}
+        disabled={loading || isSubmitting}
+      >
         Iniciar sesión
       </Button>
 
       <View style={{ height: theme.spacing[4] }} />
 
-      <Button variant="ghost" onPress={() => { console.log('[LoginForm] forgotPassword'); onForgotPassword?.(); }} fullWidth>
+      <Button
+        variant="ghost"
+        onPress={() => {
+          console.log('[LoginForm] forgotPassword');
+          onForgotPassword?.();
+        }}
+        fullWidth
+      >
         ¿Olvidaste tu contraseña?
       </Button>
     </View>

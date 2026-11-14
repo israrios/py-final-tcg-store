@@ -4,6 +4,7 @@ import { ProfileStackParamList } from './types';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { SettingsScreen } from '../screens/profile/SettingsScreen';
 import { ComponentCatalogScreen } from '../screens/catalog/ComponentCatalogScreen';
+import { ContactoScreen } from '../screens/profile/ContactoScreen';
 import { colors } from '../theme';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
@@ -23,6 +24,11 @@ export const ProfileStackNavigator: React.FC = () => {
         name="ComponentCatalog"
         component={ComponentCatalogScreen}
         options={{ title: 'Catálogo UI' }}
+      />
+      <Stack.Screen
+        name="Contacto"
+        component={ContactoScreen}
+        options={{ title: 'Contacto y Feedback' }}
       />
     </Stack.Navigator>
   );

@@ -11,6 +11,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import { ProfileStackParamList } from '../../navigation/types';
 import { useTheme } from '../../hooks/useTheme';
+import { useSesion } from '../../context/SesionContext';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -20,16 +21,16 @@ type NavProp = NativeStackNavigationProp<ProfileStackParamList, 'Profile'>;
 export const ProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavProp>();
   const theme = useTheme();
+  const { usuario, cerrarSesion } = useSesion();
 
   const handleLogout = () => {
-    Alert.alert('Cerrar sesión', '¿Deseas volver a la pantalla de Login?', [
+    Alert.alert('Cerrar sesión', '¿Deseas cerrar tu sesión actual?', [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Salir',
         style: 'destructive',
         onPress: () => {
-          // @ts-ignore
-          navigation.replace('Auth', undefined);
+          cerrarSesion();
         },
       },
     ]);
@@ -54,10 +55,10 @@ export const ProfileScreen: React.FC = () => {
         </View>
         <View style={styles.userInfo}>
           <Text style={[styles.userName, { color: theme.colors.neutral[900] }]}>
-            Usuario Demostración
+            {usuario?.nombre ?? 'Usuario Demostración'}
           </Text>
           <Text style={{ fontSize: 13, color: theme.colors.neutral[500] }}>
-            demo@cartasapp.com
+            {usuario?.correo ?? 'demo@cartasapp.com'}
           </Text>
           <View style={{ marginTop: 6 }}>
             <Badge size="sm" variant="success">Cuenta Activa</Badge>
@@ -70,6 +71,17 @@ export const ProfileScreen: React.FC = () => {
         <Text style={[styles.sectionTitle, { color: theme.colors.neutral[800] }]}>
           Navegación y Opciones:
         </Text>
+
+        <Button
+          variant="primary"
+          onPress={() => navigation.push('Contacto')}
+          fullWidth
+          leftIcon={<Ionicons name="chatbox-ellipses-outline" size={18} color={theme.colors.neutral[0]} />}
+        >
+          Contacto y Feedback
+        </Button>
+
+        <View style={styles.spacing} />
 
         <Button
           variant="secondary"

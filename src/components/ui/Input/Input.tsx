@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ComponentRef, forwardRef, useState } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../../hooks/useTheme';
 import { InputProps } from './Input.types';
 
-export const Input: React.FC<InputProps> = ({
+export type InputRef = ComponentRef<typeof TextInput>;
+
+export const Input = forwardRef<InputRef, InputProps>(({
   variant = 'default',
   label,
   helperText,
@@ -21,8 +23,10 @@ export const Input: React.FC<InputProps> = ({
   inputStyle,
   secureTextEntry,
   editable = true,
+  onFocus,
+  onBlur,
   ...rest
-}) => {
+}, ref) => {
   const theme = useTheme();
   const [focused, setFocused] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -85,10 +89,17 @@ export const Input: React.FC<InputProps> = ({
           </View>
         ) : null}
         <TextInput
+          ref={ref}
           style={[styles.input, inputStyle]}
           secureTextEntry={isPassword && !passwordVisible}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur?.(e);
+          }}
           editable={editable}
           placeholderTextColor={theme.colors.neutral[400]}
           {...rest}
@@ -109,10 +120,14 @@ export const Input: React.FC<InputProps> = ({
         ) : null}
       </View>
       {hasError ? (
-        <Text style={styles.errorText}>{errorMessage}</Text>
+        <Text style={styles.errorText} accessibilityRole="alert">
+          {errorMessage}
+        </Text>
       ) : helperText ? (
         <Text style={styles.helperText}>{helperText}</Text>
       ) : null}
     </View>
   );
-};
+});
+
+Input.displayName = 'Input';

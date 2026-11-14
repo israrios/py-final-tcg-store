@@ -9,8 +9,10 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSelector } from 'react-redux';
 import { HomeStackParamList } from '../../navigation/types';
-import { dummyCards, dummyStores } from '../../constants/dummyData';
+import { dummyStores } from '../../constants/dummyData';
+import { selectAllCards, selectCardById } from '../../store/cardsSlice';
 import { useTheme } from '../../hooks/useTheme';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -23,7 +25,9 @@ export const CardDetailScreen: React.FC<Props> = ({ route }) => {
   const navigation = useNavigation<any>();
   const theme = useTheme();
 
-  const card = dummyCards.find((c) => c.id === cardId) ?? dummyCards[0];
+  const allCards = useSelector(selectAllCards);
+  const foundCard = useSelector(selectCardById(cardId));
+  const card = foundCard ?? allCards[0];
   const availableStores = dummyStores.filter((s) => s.availableCards.includes(card.id));
 
   useLayoutEffect(() => {
